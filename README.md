@@ -18,8 +18,8 @@ obtain an RMSE value of 121.5959 (derived from the summary that R provided).
 After attempting to use multiple linear regression, we opted to try LASSO
 regression which optimizes for prediction by weighting important fields
 heavily and weighting unimportant fields with 0. Unfortunately, we might
-have implemented LASSO regression incorrectly since we got an RMSE value
-that was even higher than the "optimized" multiple linear regression model. 
+have implemented LASSO regression incorrectly since we got an RMSE value of 
+135.6928. 
 
 ### Random Forest
 
@@ -36,7 +36,7 @@ data, it's hard to say whether the decrease in performance is due to our model
 or the generated data. The code for the random forest model and some data 
 preprocessing can be found in the bottom half of datathon2024.ipynb.
 
-### Findings
+## Findings
 
 Given that random forests are "black-box" models, it's hard to interpret our
 results. However, from graphing individual explanatory variables against the
@@ -61,4 +61,3 @@ stage and the peak oil rate.
 We also noticed that oil wells with bin lateral lengths between 1.0 and 2.0 
 (inclusive) tended to result in higher oil peak rates. Inner wells also seem
 to have a higher oil peak rate compared outer wells and standalone wells. 
-

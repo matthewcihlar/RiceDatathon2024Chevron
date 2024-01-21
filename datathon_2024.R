@@ -2,7 +2,7 @@ library(dplyr)
 library(tidyr)
 library(glmnet)
 
-df <- read.csv("~/projects/private/stat_410/training.csv")
+df <- read.csv("<Insert path>")
 
 head(df)
 
@@ -10,7 +10,28 @@ head(df)
 df_mlr <- df[c("surface_x", "surface_y", "bh_x", "bh_y", "gross_perforated_length", 
                "total_proppant", "total_fluid", "true_vertical_depth", "proppant_intensity", 
                "frac_fluid_intensity", "horizontal_midpoint_x", "horizontal_midpoint_y", "horizontal_toe_x", "horizontal_toe_y",
-               "OilPeakRate")]
+               "OilPeakRate", "number_of_stages", "average_proppant_per_stage", "average_frac_fluid_per_stage")]
+
+nstages <- df_mlr$number_of_stages
+apps <- df_mlr$average_proppant_per_stage
+affps <- df_mlr$average_frac_fluid_per_stage
+opr <- df_mlr$OilPeakRate
+
+opr_nstage <- lm(opr ~ nstages)
+opr_apps <- lm(opr ~ apps)
+opr_affps <- lm(opr ~ affps)
+
+plot(nstages, opr, xlab="Number of Stages", ylab="Oil Peak Rate", main="Oil Peak Rate vs. Number of Stages")
+abline(opr_nstage, col="RED", lw=2)
+summary(opr_nstage)
+
+plot(apps, opr, xlab="Average Proppant Per Stage", ylab="Oil Peak Rate", main="Oil Peak Rate vs. Average Proppant Per Stage")
+abline(opr_apps, col="red", lw=2)
+summary(opr_apps)
+
+plot(affps, opr, xlab="Average Frac Fluid Per Stage", ylab="Oil Peak Rate", main="Oil Peak Rate vs. Average Frac Fluid Per Stage")
+abline(opr_affps, col="red", lw=2)
+summary(opr_affps)
 
 # Change erroneous values to NA
 df_mlr[is.na(df_mlr) | df_mlr == "Inf"] <- NA
@@ -72,9 +93,9 @@ pi <- training$proppant_intensity
 
 ffi <- training$frac_fluid_intensity
 
-#ptffr <- training$proppant_to_frac_fluid_ratio
+ptffr <- training$proppant_to_frac_fluid_ratio
 
-#fftpr <- training$frac_fluid_to_proppant_ratio
+fftpr <- training$frac_fluid_to_proppant_ratio
 
 hmx <- training$horizontal_midpoint_x
 hmy <- training$horizontal_midpoint_y
@@ -83,7 +104,7 @@ htx <- training$horizontal_toe_x
 hty <- training$horizontal_toe_y
 
 # Use the multiple linear regression model
-model <- lm(opr ~ sx + sy + bx + by + gpl + tp + tf + tvd + pi + ffi + hmx + hmy + htx + hty)
+model <- lm(opr ~ gpl + tp + tf + tvd + pi + ffi + htx + hty)
 
 # Get a summary of the linear regression model
 summary(model)
@@ -104,12 +125,12 @@ testing_opr <- testing$OilPeakRate
 
 x <- data.matrix(training[, c("surface_x", "surface_y", "bh_x", "bh_y", "gross_perforated_length", 
                              "total_proppant", "total_fluid", "true_vertical_depth", "proppant_intensity", 
-                             "frac_fluid_intensity", "proppant_to_frac_fluid_ratio", "frac_fluid_to_proppant_ratio",
+                             "frac_fluid_intensity", 
                              "horizontal_midpoint_x", "horizontal_midpoint_y", "horizontal_toe_x", "horizontal_toe_y")])
 
 y <- training$OilPeakRate
 
-Find optimal lambda value
+#Find optimal lambda value
 cv_model <- cv.glmnet(x, y, alpha = 1)
 
 best_lambda <- cv_model$lambda.min
@@ -120,19 +141,14 @@ coef(best_model)
 
 new = data.matrix(testing[, c("surface_x", "surface_y", "bh_x", "bh_y", "gross_perforated_length", 
                                "total_proppant", "total_fluid", "true_vertical_depth", "proppant_intensity", 
-                               "frac_fluid_intensity", "proppant_to_frac_fluid_ratio", "frac_fluid_to_proppant_ratio",
+                               "frac_fluid_intensity", 
                                "horizontal_midpoint_x", "horizontal_midpoint_y", "horizontal_toe_x", "horizontal_toe_y")])
 
-# Use LASSO regression model for prediction
-predict(best_model, s = best_lambda, newx = new)
-
 # Use fitted model to make predictions
-y_predicted <- predict(best_model, s = best_lambda, newx = x)
+y_predicted <- predict(best_model, s = best_lambda, newx = new)
 
-# Find SST and SSE
-sst <- sum((y - mean(y))^2)
-sse <- sum((y_predicted - y)^2)
+# Calculate RMSE
 
-# Find R-Squared value
-rsq <- 1 - sse/sst
-rsq
+rmse = sqrt(sum((y_predicted - testing$OilPeakRate)^2) / length(y_predicted))
+
+rmse
