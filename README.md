@@ -5,7 +5,7 @@
 ### Multiple Linear Regression
 
 Our first idea was to use multiple linear regression, which can be found in the
-top half of the datathon\_2024.R script. Our initial naive approach was to use
+top half of the datathon\_2024.R script. Our initial naive approach was to
 base our model on every numerical field. To address missing values, we used
 KNN imputing. Unfortunately, the r-squared value of our initial model was 
 around 0.4, indicating that a linear model might not be appropriate. 
