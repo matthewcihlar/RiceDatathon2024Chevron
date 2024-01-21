@@ -33,13 +33,15 @@ value of 79.308367. However, when we imputed values into the testing data, we
 obtained an RMSE value close to 100. This could imply that our random forest
 model is unreliable. However, since our model performed on imputed or "inferred"
 data, it's hard to say whether the decrease in performance is due to our model
-or the generated data.
+or the generated data. The code for the random forest model and some data 
+preprocessing can be found in the bottom half of datathon2024.ipynb.
 
 ### Findings
 
 Given that random forests are "black-box" models, it's hard to interpret our
 results. However, from graphing individual explanatory variables against the
-response variable (OilPeakRate), we had a few interesting findings.
+response variable (OilPeakRate), we had a few interesting findings. The code
+for the charts can be viewed in datafordatathon.ipynb.
 
 When plotting "OilPeakRate" against "gross\_perforated\_length," the plot
 appears to be trimodal. Specifically, there appear to be peaks when the
